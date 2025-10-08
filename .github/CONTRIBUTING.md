@@ -1,4 +1,4 @@
-# Contributing to EstateWise
+# Contributing to E2E-Pipeline
 
 Thanks for your interest in contributing! Please take a moment to read this guide.
 
@@ -7,8 +7,8 @@ Thanks for your interest in contributing! Please take a moment to read this guid
 1. Fork the repository and clone your fork (adjust the URL to your fork as needed):
 
    ```bash
-   git clone <git@github.com:your-username/EstateWise.git>
-   cd EstateWise
+   git clone <git@github.com:your-username/E2E-Pipeline.git>
+   cd E2E-Pipeline
    ```
 
 2. Install dependencies:
