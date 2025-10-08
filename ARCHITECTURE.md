@@ -30,31 +30,43 @@ This document provides a comprehensive architectural overview of the End-to-End 
 ### High-Level System Design
 
 ```mermaid
-C4Context
-    title System Context Diagram
+graph TB
+    subgraph "External Systems"
+        USER[Data Users<br/>Analysts, Scientists, Engineers]
+        ADMIN[System Admins<br/>Platform Engineers, DevOps]
+        SOURCES[Data Sources<br/>Databases, APIs, Files, Streams]
+        CLOUD[Cloud Services<br/>AWS, GCP, Azure]
+        MON_EXT[External Monitoring<br/>Prometheus, Grafana]
+    end
 
-    Person(user, "Data User", "Business analysts, data scientists, and engineers")
-    Person(admin, "System Admin", "Platform engineers and DevOps")
+    subgraph "Data Pipeline Platform"
+        subgraph "Core Components"
+            INGEST[Data Ingestion<br/>Batch & Streaming Collection]
+            PROCESS[Data Processing<br/>ETL/ELT Transformations]
+            STORE[Data Storage<br/>Multi-tier Storage Strategy]
+            SERVE[Data Serving<br/>APIs and Dashboards]
+        end
+    end
 
-    System_Boundary(pipeline, "Data Pipeline Platform") {
-        System(ingestion, "Data Ingestion", "Batch & streaming data collection")
-        System(processing, "Data Processing", "ETL/ELT transformations")
-        System(storage, "Data Storage", "Multi-tier storage strategy")
-        System(serving, "Data Serving", "APIs and dashboards")
-    }
+    USER -->|Queries & Analyzes| SERVE
+    ADMIN -->|Manages & Monitors| INGEST
+    ADMIN -->|Configures| PROCESS
+    ADMIN -->|Maintains| STORE
 
-    System_Ext(sources, "Data Sources", "Databases, APIs, files, streams")
-    System_Ext(cloud, "Cloud Services", "AWS, GCP, Azure")
-    System_Ext(monitoring, "Monitoring Tools", "Prometheus, Grafana")
+    SOURCES -->|Provides Data| INGEST
+    INGEST -->|Sends Raw Data| PROCESS
+    PROCESS -->|Stores Processed Data| STORE
+    STORE -->|Retrieves Data| SERVE
 
-    Rel(user, serving, "Queries and analyzes")
-    Rel(admin, pipeline, "Manages and monitors")
-    Rel(sources, ingestion, "Provides data")
-    Rel(ingestion, processing, "Sends raw data")
-    Rel(processing, storage, "Stores processed data")
-    Rel(storage, serving, "Retrieves data")
-    Rel(pipeline, cloud, "Deploys on")
-    Rel(pipeline, monitoring, "Sends metrics")
+    INGEST -->|Deploys on| CLOUD
+    PROCESS -->|Deploys on| CLOUD
+    STORE -->|Deploys on| CLOUD
+    SERVE -->|Deploys on| CLOUD
+
+    INGEST -->|Sends Metrics| MON_EXT
+    PROCESS -->|Sends Metrics| MON_EXT
+    STORE -->|Sends Metrics| MON_EXT
+    SERVE -->|Sends Metrics| MON_EXT
 ```
 
 ### Layered Architecture
@@ -1030,6 +1042,6 @@ This architecture provides a robust, scalable, and maintainable foundation for e
 
 For more information, see:
 - [README.md](README.md) - Project overview and setup instructions
-- [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
+- [CONTRIBUTING.md](.github/CONTRIBUTING.md) - Contribution guidelines
 - [Docker Documentation](docker-compose.yaml) - Service configurations
 - [Kubernetes Manifests](kubernetes/) - Deployment specifications
