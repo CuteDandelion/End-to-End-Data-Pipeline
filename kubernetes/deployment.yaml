@@ -26,6 +26,8 @@ spec:
               value: "LocalExecutor"
             - name: AIRFLOW__CORE__LOAD_EXAMPLES
               value: "False"
+            - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
+              value: "postgresql+psycopg2://dandy:dandy123@data-pipeline-rds.cet8668qsrqm.us-east-1.rds.amazonaws.com:5432/airflow"
           volumeMounts:
             - name: airflow-logs
               mountPath: /opt/airflow/logs
