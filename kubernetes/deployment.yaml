@@ -2,8 +2,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: end-to-end-pipeline
+  labels:
+    app: pipeline
 spec:
-  replicas: 3
+  replicas: 1   # One pod to minimize cost
   selector:
     matchLabels:
       app: pipeline
@@ -13,32 +15,62 @@ spec:
         app: pipeline
     spec:
       containers:
+
+        # Airflow UI / DAG runner
         - name: airflow
-          image: myrepo/airflow-pipeline:latest
+          image: cutedandelion/airflow-pipeline:latest
           ports:
             - containerPort: 8080
+          env:
+            - name: AIRFLOW__CORE__EXECUTOR
+              value: "LocalExecutor"
+            - name: AIRFLOW__CORE__LOAD_EXAMPLES
+              value: "False"
+          volumeMounts:
+            - name: airflow-logs
+              mountPath: /opt/airflow/logs
 
+        # Zookeeper for Kafka
+        - name: zookeeper
+          image: confluentinc/cp-zookeeper:7.3.2
+          ports:
+            - containerPort: 2181
+          env:
+            - name: ZOOKEEPER_CLIENT_PORT
+              value: "2181"
+
+        # Kafka broker
         - name: kafka
-          image: myrepo/kafka-pipeline:latest
+          image: confluentinc/cp-kafka:7.3.2
           ports:
             - containerPort: 9092
+          env:
+            - name: KAFKA_ZOOKEEPER_CONNECT
+              value: "localhost:2181"
+            - name: KAFKA_LISTENERS
+              value: "PLAINTEXT://0.0.0.0:9092"
+            - name: KAFKA_ADVERTISED_LISTENERS
+              value: "PLAINTEXT://localhost:9092"
 
+        # Spark job runner
         - name: spark
-          image: myrepo/spark-pipeline:latest
+          image: cutedandelion/spark-pipeline:latest
           ports:
             - containerPort: 4040
 
+        # Dev storage
         - name: mongodb
           image: mongo:latest
           ports:
             - containerPort: 27017
 
-        - name: hadoop
-          image: myrepo/hadoop-pipeline:latest
-          ports:
-            - containerPort: 50070
-
+        # Metrics DB
         - name: influxdb
           image: influxdb:latest
           ports:
             - containerPort: 8086
+
+      # Volumes (simple and ephemeral)
+      volumes:
+        - name: airflow-logs
+          emptyDir: {}

@@ -1,23 +1,25 @@
-variable "aws_region" {
-  description = "AWS region to deploy resources"
-  default     = "us-east-1"
-}
-
-variable "instance_type" {
-  description = "EC2 instance type"
-  default     = "t3.medium"
-}
-
-variable "db_username" {
-  description = "Database username"
-  default     = "admin"
-}
-
-variable "db_password" {
-  description = "Database password"
+variable "region" {
+  default = "us-east-1"
 }
 
 variable "eks_cluster_name" {
-  description = "EKS Cluster Name"
-  default     = "end-to-end-pipeline"
+  default = "demo-eks-cluster"
+}
+
+variable "project_name" {
+  default = "data-pipeline"
+}
+
+variable "instance_type" {
+  default = "t3.medium"
+}
+
+variable "db_username" {
+  default = "dandy"
+}
+
+variable "db_password" {
+  description = "RDS master password"
+  type        = string
+  sensitive   = true
 }

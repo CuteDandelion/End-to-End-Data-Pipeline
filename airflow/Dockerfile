@@ -8,4 +8,9 @@ USER airflow
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Baked DAGs, plugins, Great Expectations into image
+COPY dags /opt/airflow/dags
+COPY plugins /opt/airflow/plugins
+COPY great_expectations /opt/airflow/great_expectations
+
 # The default entrypoint/cmd from apache/airflow will start the scheduler/webserver

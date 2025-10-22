@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: "git@github.com:yourrepo/end-to-end-pipeline.git"
+    repoURL: https://github.com/CuteDandelion/End-to-End-Data-Pipeline.git
     targetRevision: main
     path: kubernetes
   destination:
@@ -16,3 +16,5 @@ spec:
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

@@ -1,4 +1,4 @@
-FROM bitnami/spark:3.3.2
+FROM apache/spark:3.5.7-java17-python3
 
 USER root
 RUN apt-get update && apt-get install -y python3 python3-pip

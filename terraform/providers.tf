@@ -1,13 +1,36 @@
-provider "aws" {
-  region = var.aws_region
+terraform {
+  required_version = ">= 1.6.0"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+    helm = {
+      source  = "hashicorp/helm"
+      version = "~> 2.11"
+    }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "~> 2.29"
+    }
+  }
 }
 
+provider "aws" {
+  region = var.region
+}
+
+# Will connect to the new EKS cluster later
 provider "kubernetes" {
-  config_path = "~/.kube/config"
+  host                   = data.aws_eks_cluster.eks.endpoint
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.eks.certificate_authority[0].data)
+  token                  = data.aws_eks_cluster_auth.eks.token
 }
 
 provider "helm" {
   kubernetes {
-    config_path = "~/.kube/config"
+    host                   = data.aws_eks_cluster.eks.endpoint
+    cluster_ca_certificate = base64decode(data.aws_eks_cluster.eks.certificate_authority[0].data)
+    token                  = data.aws_eks_cluster_auth.eks.token
   }
 }

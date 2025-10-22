@@ -1,26 +1,13 @@
-resource "aws_security_group" "pipeline-security" {
-  name        = "pipeline-security"
-  description = "Allow necessary traffic"
+resource "aws_security_group" "eks_cluster_sg" {
+  name        = "eks-cluster-sg"
+  description = "Security group for EKS cluster"
+  vpc_id      = module.vpc.vpc_id
 
   ingress {
-    from_port   = 22
-    to_port     = 22
+    from_port   = 443
+    to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # SSH access
-  }
-
-  ingress {
-    from_port   = 8080
-    to_port     = 8080
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # Airflow UI
-  }
-
-  ingress {
-    from_port   = 9092
-    to_port     = 9092
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # Kafka Broker
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
