@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/CuteDandelion/End-to-End-Data-Pipeline.git
-    targetRevision: main
+    targetRevision: master
     path: kubernetes
   destination:
     server: https://kubernetes.default.svc
