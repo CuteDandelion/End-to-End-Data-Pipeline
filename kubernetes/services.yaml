@@ -8,8 +8,8 @@ spec:
     app: pipeline
   ports:
     - name: airflow
-      port: 8080
-      targetPort: 8080
+      port: 5000
+      targetPort: 5000
     - name: spark-ui
       port: 4040
       targetPort: 4040
