@@ -20,22 +20,14 @@ spec:
           command: ["/bin/bash", "-c"]
           args:
             - |
+              echo "Checking if Airflow role exists..."
+              psql -h data-pipeline-rds.cet8668qsrqm.us-east-1.rds.amazonaws.com -U dandy -d postgres -tc "SELECT 1 FROM pg_roles WHERE rolname='airflow';" | grep -q 1 || \
+              psql -h data-pipeline-rds.cet8668qsrqm.us-east-1.rds.amazonaws.com -U dandy -d postgres -c "CREATE ROLE airflow WITH LOGIN PASSWORD 'airflow';"
+
               echo "Checking if Airflow DB exists..."
-              psql -h data-pipeline-rds.cet8668qsrqm.us-east-1.rds.amazonaws.com \
-                   -U dandy \
-                   -p 5432 \
-                   -d postgres \
-                   -tc "SELECT 1 FROM pg_database WHERE datname='airflow';" | grep -q 1 || \
-              psql -h data-pipeline-rds.cet8668qsrqm.us-east-1.rds.amazonaws.com \
-                   -U dandy \
-                   -p 5432 \
-                   -d postgres \
-                   -c "DO \$\$ BEGIN IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname='airflow') THEN CREATE ROLE airflow WITH LOGIN PASSWORD 'airflow'; END IF; END\$\$;" && \ 
-              psql -h data-pipeline-rds.cet8668qsrqm.us-east-1.rds.amazonaws.com \
-                   -U dandy \
-                   -p 5432 \
-                   -d postgres \
-                   -c "CREATE DATABASE airflow OWNER airflow;"
+              psql -h data-pipeline-rds.cet8668qsrqm.us-east-1.rds.amazonaws.com -U dandy -d postgres -tc "SELECT 1 FROM pg_database WHERE datname='airflow';" | grep -q 1 || \
+              psql -h data-pipeline-rds.cet8668qsrqm.us-east-1.rds.amazonaws.com -U dandy -d postgres -c "CREATE DATABASE airflow; GRANT ALL PRIVILEGES ON DATABASE airflow TO airflow;"
+
           env:
             - name: PGPASSWORD
               value: "dandy123"
