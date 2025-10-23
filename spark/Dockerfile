@@ -18,3 +18,4 @@ COPY . /opt/spark_jobs
 
 # Optional: default job
 # CMD ["spark-submit", "/opt/spark_jobs/spark_batch_job.py"]
+CMD ["tail", "-f", "/dev/null"]
