@@ -30,12 +30,12 @@ spec:
                    -U dandy \
                    -p 5432 \
                    -d postgres \
-                   -c "DO \$\$ BEGIN IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname='airflow') THEN CREATE ROLE airflow WITH LOGIN PASSWORD 'airflow'; END IF; END\$\$;CREATE DATABASE airflow OWNER airflow;" 
-              #psql -h data-pipeline-rds.cet8668qsrqm.us-east-1.rds.amazonaws.com \
-              #     -U dandy \
-              #     -p 5432 \
-              #     -d postgres \
-              #     -c "CREATE DATABASE airflow OWNER airflow;"
+                   -c "DO \$\$ BEGIN IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname='airflow') THEN CREATE ROLE airflow WITH LOGIN PASSWORD 'airflow'; END IF; END\$\$;" && \ 
+              psql -h data-pipeline-rds.cet8668qsrqm.us-east-1.rds.amazonaws.com \
+                   -U dandy \
+                   -p 5432 \
+                   -d postgres \
+                   -c "CREATE DATABASE airflow OWNER airflow;"
           env:
             - name: PGPASSWORD
               value: "dandy123"
