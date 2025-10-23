@@ -16,6 +16,9 @@ WORKDIR /opt/spark_jobs
 
 COPY . /opt/spark_jobs
 
+# Add Spark binaries to PATH
+ENV PATH=$SPARK_HOME/bin:$PATH
+
 # Optional: default job
 # CMD ["spark-submit", "/opt/spark_jobs/spark_batch_job.py"]
 CMD ["tail", "-f", "/dev/null"]
