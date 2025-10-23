@@ -24,10 +24,12 @@ spec:
               psql -h data-pipeline-rds.cet8668qsrqm.us-east-1.rds.amazonaws.com \
                    -U dandy \
                    -p 5432 \
+                   -d postgres \
                    -tc "SELECT 1 FROM pg_database WHERE datname='airflow';" | grep -q 1 || \
               psql -h data-pipeline-rds.cet8668qsrqm.us-east-1.rds.amazonaws.com \
                    -U dandy \
                    -p 5432 \
+                   -d postgres \
                    -c "CREATE DATABASE airflow OWNER airflow;"
           env:
             - name: PGPASSWORD
