@@ -50,7 +50,7 @@ spec:
           image: cutedandelion/airflow-pipeline:latest
           command: ["airflow", "standalone"]
           ports:
-            - containerPort: 8080
+            - containerPort: 5000
           env:
             - name: AIRFLOW__CORE__EXECUTOR
               value: "LocalExecutor"
