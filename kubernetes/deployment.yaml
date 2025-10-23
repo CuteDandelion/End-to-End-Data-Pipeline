@@ -26,7 +26,8 @@ spec:
 
               echo "Checking if Airflow DB exists..."
               psql -h data-pipeline-rds.cet8668qsrqm.us-east-1.rds.amazonaws.com -U dandy -d postgres -tc "SELECT 1 FROM pg_database WHERE datname='airflow';" | grep -q 1 || \
-              psql -h data-pipeline-rds.cet8668qsrqm.us-east-1.rds.amazonaws.com -U dandy -d postgres -c "CREATE DATABASE airflow; GRANT ALL PRIVILEGES ON DATABASE airflow TO airflow;"
+              psql -h data-pipeline-rds.cet8668qsrqm.us-east-1.rds.amazonaws.com -U dandy -d postgres -c "CREATE DATABASE airflow;"
+              psql -h data-pipeline-rds.cet8668qsrqm.us-east-1.rds.amazonaws.com -U dandy -d postgres -c "GRANT ALL PRIVILEGES ON DATABASE airflow TO airflow;"
 
           env:
             - name: PGPASSWORD
