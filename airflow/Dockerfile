@@ -1,4 +1,4 @@
-FROM apache/airflow:2.5.0-python3.9
+FROM apache/airflow:3.1.1rc1-python3.13
 
 USER root
 RUN apt-get update && apt-get install -y gcc libpq-dev

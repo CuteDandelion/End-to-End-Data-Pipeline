@@ -38,7 +38,7 @@ spec:
           command: ["/bin/bash", "-c"]
           args:
             - |
-              airflow db init
+              airflow db migrate
               airflow users create \
                 --username admin \
                 --password admin \
