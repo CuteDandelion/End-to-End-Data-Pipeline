@@ -15,6 +15,42 @@ spec:
         app: pipeline
     spec:
       containers:
+        # Pre Airflow Flow
+        initContainers:
+        - name: create-airflow-db
+          image: postgres:14
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              echo "Checking if Airflow DB exists..."
+              psql -h data-pipeline-rds.cet8668qsrqm.us-east-1.rds.amazonaws.com \
+                   -U dandy \
+                   -p 5432 \
+                   -tc "SELECT 1 FROM pg_database WHERE datname='airflow';" | grep -q 1 || \
+              psql -h data-pipeline-rds.cet8668qsrqm.us-east-1.rds.amazonaws.com \
+                   -U dandy \
+                   -p 5432 \
+                   -c "CREATE DATABASE airflow OWNER airflow;"
+          env:
+            - name: PGPASSWORD
+              value: "dandy123"
+
+        - name: init-airflow-schema
+          image: cutedandelion/airflow-pipeline:latest
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              airflow db init
+              airflow users create \
+                --username admin \
+                --password admin \
+                --firstname Admin \
+                --lastname User \
+                --role Admin \
+                --email admin@example.com || true
+          env:
+            - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
+              value: "postgresql+psycopg2://dandy:dandy123@data-pipeline-rds.cet8668qsrqm.us-east-1.rds.amazonaws.com:5432/airflow"
 
         # Airflow UI / DAG runner
         - name: airflow
@@ -28,6 +64,10 @@ spec:
               value: "False"
             - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
               value: "postgresql+psycopg2://dandy:dandy123@data-pipeline-rds.cet8668qsrqm.us-east-1.rds.amazonaws.com:5432/airflow"
+            - name: AIRFLOW__WEBSERVER__WEB_SERVER_HOST
+              value: "0.0.0.0"
+            - name: AIRFLOW__WEBSERVER__WEB_SERVER_PORT
+              value: "8080"
           volumeMounts:
             - name: airflow-logs
               mountPath: /opt/airflow/logs
