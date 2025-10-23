@@ -38,14 +38,8 @@ spec:
           command: ["/bin/bash", "-c"]
           args:
             - |
+              echo "Running DB migration..."
               airflow db migrate
-              airflow users create \
-                --username admin \
-                --password admin \
-                --firstname Admin \
-                --lastname User \
-                --role Admin \
-                --email admin@example.com || true
           env:
             - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
               value: "postgresql+psycopg2://dandy:dandy123@data-pipeline-rds.cet8668qsrqm.us-east-1.rds.amazonaws.com:5432/airflow"
@@ -54,6 +48,7 @@ spec:
         # Airflow UI / DAG runner
         - name: airflow
           image: cutedandelion/airflow-pipeline:latest
+          command: ["airflow", "standalone"]
           ports:
             - containerPort: 8080
           env:
