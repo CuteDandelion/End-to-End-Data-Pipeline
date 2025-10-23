@@ -14,9 +14,7 @@ spec:
       labels:
         app: pipeline
     spec:
-      containers:
-        # Pre Airflow Flow
-        initContainers:
+      initContainers:
         - name: create-airflow-db
           image: postgres:14
           command: ["/bin/bash", "-c"]
@@ -52,6 +50,7 @@ spec:
             - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
               value: "postgresql+psycopg2://dandy:dandy123@data-pipeline-rds.cet8668qsrqm.us-east-1.rds.amazonaws.com:5432/airflow"
 
+      containers:
         # Airflow UI / DAG runner
         - name: airflow
           image: cutedandelion/airflow-pipeline:latest
