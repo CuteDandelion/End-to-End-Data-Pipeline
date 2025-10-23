@@ -22,11 +22,11 @@ spec:
             - |
               echo "Checking if Airflow DB exists..."
               psql -h data-pipeline-rds.cet8668qsrqm.us-east-1.rds.amazonaws.com \
-                   -U postgres \
+                   -U dandy \
                    -p 5432 \
                    -tc "SELECT 1 FROM pg_database WHERE datname='airflow';" | grep -q 1 || \
               psql -h data-pipeline-rds.cet8668qsrqm.us-east-1.rds.amazonaws.com \
-                   -U postgres \
+                   -U dandy \
                    -p 5432 \
                    -c "CREATE DATABASE airflow OWNER airflow;"
           env:
