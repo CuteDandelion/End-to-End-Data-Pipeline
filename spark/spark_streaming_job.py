@@ -111,7 +111,8 @@ def main():
         # Initialize Spark session
         spark = SparkSession.builder \
             .appName("StreamingETL") \
-           # .config("spark.jars.packages", "org.apache.hadoop:hadoop-aws:3.3.6") \
+            .config("spark.driver.extraJavaOptions", "-Duser.name=spark") \
+            .config("spark.executor.extraJavaOptions", "-Duser.name=spark") \
             .getOrCreate()
 
         # Configure Spark to access MinIO using s3a
