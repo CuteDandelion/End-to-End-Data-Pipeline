@@ -95,7 +95,12 @@ spec:
         # Kafka client - to run producer script
         - name: kafka-client
           image: python:3.10
-          command: ["sleep", "infinity"]
+          command: ["/bin/bash", "-c"]
+          args:
+            # Install kafka-python once, then sleep forever
+            - |
+              pip install --no-cache-dir kafka-python && \
+              sleep infinity
 
         # Spark job runner
         - name: spark
