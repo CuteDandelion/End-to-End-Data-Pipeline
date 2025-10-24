@@ -6,7 +6,7 @@ import great_expectations as ge
 import psycopg2
 import os
 
-# Logging Configuration
+## Logging Configuration
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 # Kafka Configuration
@@ -111,7 +111,7 @@ def main():
         # Initialize Spark session
         spark = SparkSession.builder \
             .appName("StreamingETL") \
-            .config("spark.jars.packages", "org.apache.hadoop:hadoop-aws:3.3.6") \
+           # .config("spark.jars.packages", "org.apache.hadoop:hadoop-aws:3.3.6") \
             .getOrCreate()
 
         # Configure Spark to access MinIO using s3a
