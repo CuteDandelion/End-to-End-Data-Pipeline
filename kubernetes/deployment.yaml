@@ -92,6 +92,11 @@ spec:
             - name: KAFKA_ADVERTISED_LISTENERS
               value: "PLAINTEXT://localhost:9092"
 
+        # Kafka client - to run producer script
+        - name: kafka-client
+          image: python:3.10
+          command: ["sleep", "infinity"]
+
         # Spark job runner
         - name: spark
           image: cutedandelion/spark-pipeline:latest
