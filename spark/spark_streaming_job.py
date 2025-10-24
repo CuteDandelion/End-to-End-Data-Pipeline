@@ -10,16 +10,16 @@ import os
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 # Kafka Configuration
-KAFKA_BROKER = "kafka:9092"
+KAFKA_BROKER = "127.0.0.1:9092"
 KAFKA_TOPIC = "sensor_readings"
 CONSUMER_GROUP = "sensor_readings_consumer"
 
 # MinIO (S3-Compatible Storage) Configuration
-MINIO_ENDPOINT = "http://minio:9000"
+MINIO_ENDPOINT = "https://s3.amazonaws.com"
 MINIO_ACCESS_KEY = "minio"
 MINIO_SECRET_KEY = "minio123"
-RAW_DATA_PATH = "s3a://raw-data/streaming_raw/"
-ANOMALY_DATA_PATH = "s3a://processed-data/streaming_anomalies/"
+RAW_DATA_PATH = "s3a://data-pipeline-data-bucket-104b0071/raw-data/streaming_raw/"
+ANOMALY_DATA_PATH = "s3a://data-pipeline-data-bucket-104b0071/processed-data/streaming_anomalies/"
 
 # PostgreSQL Configuration
 POSTGRES_HOST = "postgres"
@@ -111,14 +111,15 @@ def main():
         # Initialize Spark session
         spark = SparkSession.builder \
             .appName("StreamingETL") \
-            .config("spark.jars.packages", "org.postgresql:postgresql:42.2.18") \
+            .config("spark.jars.packages", "org.apache.hadoop:hadoop-aws:3.3.6") \
             .getOrCreate()
 
         # Configure Spark to access MinIO using s3a
         spark._jsc.hadoopConfiguration().set("fs.s3a.endpoint", MINIO_ENDPOINT)
-        spark._jsc.hadoopConfiguration().set("fs.s3a.access.key", MINIO_ACCESS_KEY)
-        spark._jsc.hadoopConfiguration().set("fs.s3a.secret.key", MINIO_SECRET_KEY)
-        spark._jsc.hadoopConfiguration().set("fs.s3a.path.style.access", "true")
+       # spark._jsc.hadoopConfiguration().set("fs.s3a.access.key", MINIO_ACCESS_KEY)
+       # spark._jsc.hadoopConfiguration().set("fs.s3a.secret.key", MINIO_SECRET_KEY)
+       # spark._jsc.hadoopConfiguration().set("fs.s3a.path.style.access", "true")
+        spark._jsc.hadoopConfiguration().set("fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
 
         logging.info(f"Starting Spark Structured Streaming from Kafka topic: {KAFKA_TOPIC}")
 
@@ -166,10 +167,10 @@ def main():
             .start()
 
         # Write anomalies to PostgreSQL
-        df_anomalies.writeStream \
-            .foreachBatch(lambda batch_df, batch_id: save_to_postgres(batch_df, "anomalies_stream")) \
-            .outputMode("append") \
-            .start()
+        #df_anomalies.writeStream \
+        #    .foreachBatch(lambda batch_df, batch_id: save_to_postgres(batch_df, "anomalies_stream")) \
+        #    .outputMode("append") \
+        #    .start()
 
         logging.info("Streaming job started. Processing events in real-time.")
 
