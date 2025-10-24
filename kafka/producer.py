@@ -12,7 +12,7 @@ import os
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 # Kafka Configuration (Can be overridden using environment variables)
-KAFKA_BROKER = os.getenv("KAFKA_BROKER", "kafka:9092")
+KAFKA_BROKER = os.getenv("KAFKA_BROKER", "127.0.0.1:9092")
 KAFKA_TOPIC = os.getenv("KAFKA_TOPIC", "sensor_readings")
 MESSAGE_FREQUENCY = float(os.getenv("MESSAGE_FREQUENCY", 1))  # Delay between messages (seconds)
 BATCH_SIZE = int(os.getenv("BATCH_SIZE", 10))  # Number of messages per batch

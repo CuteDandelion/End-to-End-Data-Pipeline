@@ -1,5 +1,6 @@
 from airflow import DAG
-from airflow.operators.python_operator import PythonOperator
+#from airflow.operators.python_operator import PythonOperator
+from airflow.providers.standard.operators.python import PythonOperator
 from datetime import datetime
 import logging
 from kafka import KafkaAdminClient, KafkaConsumer
@@ -7,7 +8,7 @@ from kafka.admin import NewTopic
 from kafka.errors import KafkaError
 
 # Kafka Configuration
-KAFKA_BROKER = "kafka:9092"  # Replace with your Kafka broker if needed
+KAFKA_BROKER = "127.0.0.1:9092"  # Replace with your Kafka broker if needed
 KAFKA_TOPIC = "sensor_readings"
 CONSUMER_GROUP = "sensor_readings_consumer"
 LAG_THRESHOLD = 10  # Adjust this threshold as per business needs

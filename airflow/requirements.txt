@@ -4,3 +4,4 @@ great_expectations
 boto3
 pandas
 psycopg2
+kafka-python
