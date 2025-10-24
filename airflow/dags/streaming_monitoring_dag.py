@@ -84,7 +84,7 @@ default_args = {
 with DAG(
         dag_id='streaming_monitoring_dag',
         default_args=default_args,
-        schedule_interval='@hourly',
+        schedule='*/10 * * * *',
         catchup=False
 ) as dag:
     monitor_kafka_task = PythonOperator(
