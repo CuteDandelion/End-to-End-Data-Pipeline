@@ -2,10 +2,11 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import from_json, col, when, lit
 from pyspark.sql.types import StructType, StructField, StringType, LongType, DoubleType
 import logging
-#import great_expectations as ge
-from great_expectations.dataset import PandasDataset
+import great_expectations as ge
+from great_expectations.core.batch import RuntimeBatchRequest
 import psycopg2
 import os
+import sys
 
 ## Logging Configuration
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -49,27 +50,51 @@ def validate_schema(df):
     """
     logging.info("Validating streaming data schema with Great Expectations...")
 
-    ge_df = PandasDataset(df.toPandas())  # Convert Spark DataFrame to Pandas for validation
+    context = ge.get_context()
+
+    ge_df = df.toPandas()  # Convert Spark DataFrame to Pandas for validation
+
+    # Create a RuntimeBatchRequest
+    batch_request = RuntimeBatchRequest(
+        datasource_name="in_memory_pandas",
+        data_connector_name="runtime_data_connector",
+        data_asset_name="sensor_data",
+        runtime_parameters={"batch_data": ge_df},
+        batch_identifiers={"run_id": "stream_validation"}
+    )
+
+    # Create a simple in-memory datasource (if not already configured)
+    context.add_datasource(
+        name="in_memory_pandas",
+        class_name="Datasource",
+        execution_engine={"class_name": "PandasExecutionEngine"},
+        data_connectors={
+            "runtime_data_connector": {
+                "class_name": "RuntimeDataConnector",
+                "batch_identifiers": ["run_id"]
+            }
+        }
+    )
+   
+    validator = context.get_validator(batch_request=batch_request)
 
     # Expect event_id to be unique and non-null
-    result_event_id = ge_df.expect_column_values_to_not_be_null("event_id")
-    if not result_event_id.success:
-        raise ValueError("Validation failed: 'event_id' contains null values")
+    validator.expect_column_values_to_not_be_null("event_id")
 
     # Expect timestamp to be non-null and positive
-    result_timestamp = ge_df.expect_column_values_to_be_between("timestamp", min_value=1)
-    if not result_timestamp.success:
-        raise ValueError("Validation failed: 'timestamp' contains negative or null values")
+    validator.expect_column_values_to_be_between("timestamp", min_value=1)
 
     # Expect device_id to be non-null and positive
-    result_device_id = ge_df.expect_column_values_to_be_between("device_id", min_value=1)
-    if not result_device_id.success:
-        raise ValueError("Validation failed: 'device_id' contains negative values")
-
+    validator.expect_column_values_to_be_between("device_id", min_value=1)
+    
     # Expect reading_value to be between 0 and 100 (sensor range)
-    result_reading_value = ge_df.expect_column_values_to_be_between("reading_value", min_value=0, max_value=100)
-    if not result_reading_value.success:
-        raise ValueError("Validation failed: 'reading_value' is outside the expected range")
+    validator.expect_column_values_to_be_between("reading_value", min_value=0, max_value=100)
+    
+    result = validator.validate()
+    if result["success"] is False:
+       logging.info("Schema validation failed.")
+       logging.info(result)
+       sys.exit(1)
 
     logging.info("Schema validation passed.")
 
@@ -126,15 +151,25 @@ def main():
         logging.info(f"Starting Spark Structured Streaming from Kafka topic: {KAFKA_TOPIC}")
 
         # Read stream from Kafka
-        df_raw = spark.readStream \
+        df_stream = spark.readStream \
             .format("kafka") \
             .option("kafka.bootstrap.servers", KAFKA_BROKER) \
             .option("subscribe", KAFKA_TOPIC) \
             .option("startingOffsets", "latest") \
             .load()
 
+        # Convert key and value to strings
+        stream_data = df_stream.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
+        
+        query = stream_data.writeStream \
+           .outputMode("append") \
+           .format("console") \
+           .start()
+    
+        query.awaitTermination()
+
         # Parse JSON messages
-        df_parsed = df_raw.select(
+        df_parsed = df_stream.select(
             from_json(col("value").cast("string"), schema).alias("json_data")
         ).select("json_data.*")
 

@@ -74,6 +74,7 @@ def produce_messages():
             # Send batch if batch size is reached
             if len(batch) >= BATCH_SIZE:
                 for msg in batch:
+                    logging.info(msg)
                     producer.send(KAFKA_TOPIC, msg)
                 producer.flush()
                 logging.info(f"Sent batch of {len(batch)} messages to Kafka topic: {KAFKA_TOPIC}")
