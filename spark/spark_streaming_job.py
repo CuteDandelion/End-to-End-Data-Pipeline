@@ -2,7 +2,8 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import from_json, col, when, lit
 from pyspark.sql.types import StructType, StructField, StringType, LongType, DoubleType
 import logging
-import great_expectations as ge
+#import great_expectations as ge
+from great_expectations.dataset import PandasDataset
 import psycopg2
 import os
 
@@ -48,7 +49,7 @@ def validate_schema(df):
     """
     logging.info("Validating streaming data schema with Great Expectations...")
 
-    ge_df = ge.from_pandas(df.toPandas())  # Convert Spark DataFrame to Pandas for validation
+    ge_df = PandasDataset(df.toPandas())  # Convert Spark DataFrame to Pandas for validation
 
     # Expect event_id to be unique and non-null
     result_event_id = ge_df.expect_column_values_to_not_be_null("event_id")
