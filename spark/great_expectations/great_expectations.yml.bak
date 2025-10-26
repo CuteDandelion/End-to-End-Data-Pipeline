@@ -1,3 +1,14 @@
+datasources:
+  my_pandas_datasource:
+    class_name: Datasource
+    execution_engine:
+      class_name: PandasExecutionEngine
+    data_connectors:
+      my_runtime_data_connector:
+        class_name: RuntimeDataConnector
+        batch_identifiers:
+          - default_identifier_name
+
 stores:
   expectations_store:
     class_name: ExpectationStore

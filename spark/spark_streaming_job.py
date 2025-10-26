@@ -18,10 +18,10 @@ CONSUMER_GROUP = "sensor_readings_consumer"
 
 # MinIO (S3-Compatible Storage) Configuration
 MINIO_ENDPOINT = "https://s3.amazonaws.com"
-MINIO_ACCESS_KEY = "minio"
-MINIO_SECRET_KEY = "minio123"
-RAW_DATA_PATH = "s3a://data-pipeline-data-bucket-104b0071/raw-data/streaming_raw/"
-ANOMALY_DATA_PATH = "s3a://data-pipeline-data-bucket-104b0071/processed-data/streaming_anomalies/"
+MINIO_ACCESS_KEY = "AKIA"
+MINIO_SECRET_KEY = "AE2K"
+RAW_DATA_PATH = "s3a://data-pipeline-data-bucket-572642e9/raw-data/streaming_raw/"
+ANOMALY_DATA_PATH = "s3a://data-pipeline-data-bucket-572642e9/processed-data/streaming_anomalies/"
 
 # PostgreSQL Configuration
 POSTGRES_HOST = "postgres"
@@ -39,7 +39,7 @@ schema = StructType([
 ])
 
 
-def validate_schema(df):
+def validate_schema(df, batch_id):
     """
     Validate the schema of the incoming streaming DataFrame using Great Expectations.
     Ensures:
@@ -50,33 +50,22 @@ def validate_schema(df):
     """
     logging.info("Validating streaming data schema with Great Expectations...")
 
-    context = ge.get_context()
+    context = ge.get_context(context_root_dir="/opt/spark_jobs/great_expectations")
 
     ge_df = df.toPandas()  # Convert Spark DataFrame to Pandas for validation
 
-    # Create a RuntimeBatchRequest
-    batch_request = RuntimeBatchRequest(
-        datasource_name="in_memory_pandas",
-        data_connector_name="runtime_data_connector",
-        data_asset_name="sensor_data",
-        runtime_parameters={"batch_data": ge_df},
-        batch_identifiers={"run_id": "stream_validation"}
-    )
+    datasource = context.get_datasource("my_pandas_datasource")
+    asset = datasource.get_asset("my_runtime_data_asset")
+    batch_request = asset.build_batch_request(options={"dataframe": ge_df})
 
-    # Create a simple in-memory datasource (if not already configured)
-    context.add_datasource(
-        name="in_memory_pandas",
-        class_name="Datasource",
-        execution_engine={"class_name": "PandasExecutionEngine"},
-        data_connectors={
-            "runtime_data_connector": {
-                "class_name": "RuntimeDataConnector",
-                "batch_identifiers": ["run_id"]
-            }
-        }
-    )
-   
-    validator = context.get_validator(batch_request=batch_request)
+    # Create (or load) an expectation suite
+    try:
+        context.add_or_update_expectation_suite(expectation_suite_name="stream_suite")
+    except Exception:
+        pass
+
+       
+    validator = context.get_validator(batch_request=batch_request, create_expectation_suite_with_name="stream_suite")
 
     # Expect event_id to be unique and non-null
     validator.expect_column_values_to_not_be_null("event_id")
@@ -91,12 +80,12 @@ def validate_schema(df):
     validator.expect_column_values_to_be_between("reading_value", min_value=0, max_value=100)
     
     result = validator.validate()
-    if result["success"] is False:
-       logging.info("Schema validation failed.")
+    if not result["success"]:
        logging.info(result)
-       sys.exit(1)
+       raise ValueError("GE validation failed for batch {}".format(batch_id))
 
-    logging.info("Schema validation passed.")
+    logging.info("Schema validation passed for batch {}".format(batch_id))
+    logging.info(result)
 
 
 def save_to_postgres(df, table_name):
@@ -122,6 +111,36 @@ def save_to_postgres(df, table_name):
         logging.error(f"Failed to write to PostgreSQL: {str(e)}")
 
 
+# Define per-batch processing logic
+def process_batch(batch_df, batch_id):
+    logging.info("Processing Streaming Starting ...")
+    logging.info(f"Processing batch {batch_id}")
+
+    batch_df.show(5, truncate=False)
+
+    # Validate schema
+    validate_schema(batch_df, batch_id)
+
+    if not batch_df.isEmpty():
+       # Write raw streaming data to MinIO (S3)
+       batch_df.write \
+         .format("parquet") \
+         .mode("append") \
+         .option("path", RAW_DATA_PATH) \
+         .save()
+ 
+       # Detect anomalies where reading_value > 70
+       df_anomalies = batch_df.filter(col("reading_value") > 70.0)
+
+       # Write anomaly data to MinIO (S3)
+       df_anomalies.write \
+         .format("parquet") \
+         .mode("append") \
+         .option("path", ANOMALY_DATA_PATH) \
+         .save()
+ 
+
+
 def main():
     """
     Streaming ETL Pipeline:
@@ -143,8 +162,8 @@ def main():
 
         # Configure Spark to access MinIO using s3a
         spark._jsc.hadoopConfiguration().set("fs.s3a.endpoint", MINIO_ENDPOINT)
-       # spark._jsc.hadoopConfiguration().set("fs.s3a.access.key", MINIO_ACCESS_KEY)
-       # spark._jsc.hadoopConfiguration().set("fs.s3a.secret.key", MINIO_SECRET_KEY)
+        spark._jsc.hadoopConfiguration().set("fs.s3a.access.key", MINIO_ACCESS_KEY)
+        spark._jsc.hadoopConfiguration().set("fs.s3a.secret.key", MINIO_SECRET_KEY)
        # spark._jsc.hadoopConfiguration().set("fs.s3a.path.style.access", "true")
         spark._jsc.hadoopConfiguration().set("fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
 
@@ -158,15 +177,6 @@ def main():
             .option("startingOffsets", "latest") \
             .load()
 
-        # Convert key and value to strings
-        stream_data = df_stream.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
-        
-        query = stream_data.writeStream \
-           .outputMode("append") \
-           .format("console") \
-           .start()
-    
-        query.awaitTermination()
 
         # Parse JSON messages
         df_parsed = df_stream.select(
@@ -181,37 +191,21 @@ def main():
             col("reading_value").isNotNull()
         )
 
-        # Validate schema
-        validate_schema(df_clean)
-
-        # Detect anomalies where reading_value > 70
-        df_anomalies = df_clean.filter(col("reading_value") > 70.0)
-
-        # Write raw streaming data to MinIO (S3)
-        df_clean.writeStream \
-            .format("parquet") \
-            .option("checkpointLocation", "/tmp/spark-checkpoints/raw") \
-            .option("path", RAW_DATA_PATH) \
-            .outputMode("append") \
+        # WriteStream with foreachBatch
+        query = (
+           df_clean.writeStream
+            .outputMode("append")
+            .foreachBatch(process_batch)
+            .option("checkpointLocation", "/tmp/spark-checkpoints/kafka_stream")
             .start()
+        )
 
-        # Write anomaly data to MinIO (S3)
-        df_anomalies.writeStream \
-            .format("parquet") \
-            .option("checkpointLocation", "/tmp/spark-checkpoints/anomalies") \
-            .option("path", ANOMALY_DATA_PATH) \
-            .outputMode("append") \
-            .start()
+        query.awaitTermination()
 
         # Write anomalies to PostgreSQL
         #df_anomalies.writeStream \
         #    .foreachBatch(lambda batch_df, batch_id: save_to_postgres(batch_df, "anomalies_stream")) \
         #    .outputMode("append") \
-        #    .start()
-
-        logging.info("Streaming job started. Processing events in real-time.")
-
-        spark.streams.awaitAnyTermination()
 
     except Exception as e:
         logging.error(f"Streaming processing failed: {str(e)}")
