@@ -18,10 +18,10 @@ CONSUMER_GROUP = "sensor_readings_consumer"
 
 # MinIO (S3-Compatible Storage) Configuration
 MINIO_ENDPOINT = "https://s3.amazonaws.com"
-MINIO_ACCESS_KEY = "AKIA"
-MINIO_SECRET_KEY = "AE2K"
-RAW_DATA_PATH = "s3a://data-pipeline-data-bucket-572642e9/raw-data/streaming_raw/"
-ANOMALY_DATA_PATH = "s3a://data-pipeline-data-bucket-572642e9/processed-data/streaming_anomalies/"
+MINIO_ACCESS_KEY = os.getenv("AWS_ACCESS_KEY", default=None)
+MINIO_SECRET_KEY = os.getenv("AWS_SECRET_KEY", default=None)
+RAW_DATA_PATH = os.getenv("RAW_DATA_PATH", default=None)
+ANOMALY_DATA_PATH = os.getenv("ANOMALY_DATA_PATH", default=None)
 
 # PostgreSQL Configuration
 POSTGRES_HOST = "postgres"

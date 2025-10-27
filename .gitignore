@@ -5,3 +5,4 @@ terraform/.terraform/
 *.tfstate.backup
 *.tfstate.*
 *.jar
+secrets.yaml

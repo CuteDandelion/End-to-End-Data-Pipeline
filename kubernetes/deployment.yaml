@@ -112,7 +112,20 @@ spec:
               value: "4040"
             - name: SPARK_MASTER_PORT
               value: "7077"
-
+            - name: AWS_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-credentials
+                  key: AWS_ACCESS_KEY
+            - name: AWS_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-credentials
+                  key: AWS_SECRET_KEY
+            - name: RAW_DATA_PATH
+              value: "s3a://data-pipeline-data-bucket-a64c9b91/raw-data/streaming_raw/"
+            - name: ANOMALY_DATA_PATH
+              value: "s3a://data-pipeline-data-bucket-a64c9b91/processed-data/streaming_anomalies/"
         # Dev storage
         - name: mongodb
           image: mongo:latest
