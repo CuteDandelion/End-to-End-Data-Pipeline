@@ -51,6 +51,12 @@ The updated architecture for streaming focus on buidling an AWS native datawareh
 
 ![AWS-Infra](https://github.com/user-attachments/assets/0e257152-e2ed-44c8-8339-cacafdbd5aee)
 
+### Challenges
+
+- Issue regarding version compatibility between kafka & spark due to template using old docker images which is no longer available to the public (main focus on open source).
+- GE (Great Expectations) version upgrade due to unexpected docker images changes , hence overhaul of spark script is required to match GE 1.8.0.
+- Issue Creating Connection between AWS redshift & AWS Glue due to missing AWS IAM permissions / policies & AWS internal networking issues (Fix is still ongoing)
+
 ## Results
 
 ### Kubernetes 
