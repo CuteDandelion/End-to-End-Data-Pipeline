@@ -40,20 +40,49 @@ Read this README and follow the step-by-step guide to set up the pipeline on you
 
 The updated architecture for streaming focus on buidling an AWS native datawarehouse ELT/ETL pipeline with the introduction of AWS Redshift & AWS Glue. The general pipeline flow is as below : 
 
-1) Terraform initialize & provision cloud pipeline environment in AWS. 
-2) Kafka produce defined sensors streaming events.
-3) Spark listens for kafka events , validate schema & anomalies via great expectations, and pushing data batches into S3 buckets as parquets.
-4) AWS Glue Crawler scan the S3 buckets for RAW events & ANOMALIES events data (parquet format) follow by creating metadata in the form of catalogs.
-5) Creating an AWS Glue connection to bridge AWS Redshift Cluster and AWS Glue Catalogs in order for Redshift to query sensor data.
+1) Terraform initialize & provision cloud pipeline environment in AWS.
+2) Deploy relevant services on argocd via EKS (Elastic Kubernetes Service)
+3) Kafka produce defined sensors streaming events.
+4) Spark listens for kafka events , validate schema & anomalies via great expectations, and pushing data batches into S3 buckets as parquets.
+5) AWS Glue Crawler scan the S3 buckets for RAW events & ANOMALIES events data (parquet format) follow by creating metadata in the form of catalogs.
+6) Creating an AWS Glue connection to bridge AWS Redshift Cluster and AWS Glue Catalogs in order for Redshift to query sensor data.
 
 ### High-Level Architecture Diagram
 
 ![AWS-Infra](https://github.com/user-attachments/assets/0e257152-e2ed-44c8-8339-cacafdbd5aee)
 
+## Results
 
+### Kubernetes 
 
+<img width="1710" height="1077" alt="kubectlGetAll-1" src="https://github.com/user-attachments/assets/2bad6d23-7612-40dd-9e01-63fac89b41bc" />
 
-## Table of Contents (Template)
+### ArgoCD
+
+<img width="1875" height="1061" alt="argocd-2-1" src="https://github.com/user-attachments/assets/46031f8e-078f-419c-8900-d5ff8f12a274" />
+<img width="1870" height="1076" alt="argocd-2-2" src="https://github.com/user-attachments/assets/2bcf378a-5c63-4083-bb45-a562cc4dd167" />
+
+### Kafka 
+
+### spark-submit
+
+### S3 Buckets - Parquets
+
+<img width="1867" height="1052" alt="S3-3-1" src="https://github.com/user-attachments/assets/2c4df42e-3efb-4aac-a784-d1d5200994e4" />
+<img width="1887" height="1052" alt="S3-3-2" src="https://github.com/user-attachments/assets/5ad4308c-b37b-41dd-8052-0fe68e1318e3" />
+
+### AWS Glue Crawlers
+
+<img width="1888" height="946" alt="glue-crawler" src="https://github.com/user-attachments/assets/d613337c-c3f7-4ec4-b19e-55d0d370a819" />
+<img width="1892" height="950" alt="glue-crawler-2" src="https://github.com/user-attachments/assets/eb959d49-e410-4591-b2fa-9089047c1a13" />
+
+### AWS Redshift
+
+*Still In Progress*
+
+## More Information Regarding Template
+
+## Table of Contents 
 
 1. [Architecture Overview](#architecture-overview)
 2. [Directory Structure](#directory-structure)
