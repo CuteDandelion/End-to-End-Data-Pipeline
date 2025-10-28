@@ -14,7 +14,7 @@ The pipeline incorporates:
 
 - **Data Storage:**  
   - **Raw Data:** Stored in MinIO (S3-compatible storage)  
-  - **Processed Data:** Loaded into PostgreSQL for analytics and reporting
+  - **Processed Data:** Loaded into PostgreSQL / S3 for analytics and reporting
 
 - **Data Quality, Monitoring & Governance:**  
   - **Data Quality:** Great Expectations validates incoming data  
