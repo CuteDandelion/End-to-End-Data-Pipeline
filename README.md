@@ -70,7 +70,11 @@ The updated architecture for streaming focus on buidling an AWS native datawareh
 
 ### Kafka 
 
+https://github.com/user-attachments/assets/5de697f0-a3ea-4b16-83fe-d247e73060cd
+
 ### spark-submit
+
+https://github.com/user-attachments/assets/a6badc68-4a03-4003-96a1-397b32aefa30
 
 ### S3 Buckets - Parquets
 
