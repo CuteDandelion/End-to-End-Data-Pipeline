@@ -34,7 +34,11 @@ The pipeline incorporates:
 
 Read this README and follow the step-by-step guide to set up the pipeline on your local machine or cloud environment. Customize the pipeline components, configurations, and example applications to suit your data processing needs.
 
-## Table of Contents
+## Personal Updates (28.10.2025)
+
+
+
+## Table of Contents (Template)
 
 1. [Architecture Overview](#architecture-overview)
 2. [Directory Structure](#directory-structure)
