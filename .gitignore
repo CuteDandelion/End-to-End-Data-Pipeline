@@ -1,8 +1,10 @@
 .venv
 .terraform.lock.hcl
 terraform/.terraform/
+terraform-redshift/redshift/.terraform/
 *.tfstate
 *.tfstate.backup
 *.tfstate.*
 *.jar
+*.tfvars
 secrets.yaml
