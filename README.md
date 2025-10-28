@@ -36,6 +36,21 @@ Read this README and follow the step-by-step guide to set up the pipeline on you
 
 ## Personal Updates (28.10.2025)
 
+## Updated Architecture Overview - Streaming
+
+The updated architecture for streaming focus on buidling an AWS native datawarehouse ELT/ETL pipeline with the introduction of AWS Redshift & AWS Glue. The general pipeline flow is as below : 
+
+1) Terraform initialize & provision cloud pipeline environment in AWS. 
+2) Kafka produce defined sensors streaming events.
+3) Spark listens for kafka events , validate schema & anomalies via great expectations, and pushing data batches into S3 buckets as parquets.
+4) AWS Glue Crawler scan the S3 buckets for RAW events & ANOMALIES events data (parquet format) follow by creating metadata in the form of catalogs.
+5) Creating an AWS Glue connection to bridge AWS Redshift Cluster and AWS Glue Catalogs in order for Redshift to query sensor data.
+
+### High-Level Architecture Diagram
+
+![AWS-Infra](https://github.com/user-attachments/assets/0e257152-e2ed-44c8-8339-cacafdbd5aee)
+
+
 
 
 ## Table of Contents (Template)
