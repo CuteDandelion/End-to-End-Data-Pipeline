@@ -86,9 +86,13 @@ https://github.com/user-attachments/assets/a6badc68-4a03-4003-96a1-397b32aefa30
 <img width="1888" height="946" alt="glue-crawler" src="https://github.com/user-attachments/assets/d613337c-c3f7-4ec4-b19e-55d0d370a819" />
 <img width="1892" height="950" alt="glue-crawler-2" src="https://github.com/user-attachments/assets/eb959d49-e410-4591-b2fa-9089047c1a13" />
 
+### Glue Jobs
+
+<img width="1902" height="1032" alt="glue-job" src="https://github.com/user-attachments/assets/b63564fc-d15a-4e20-a8ad-82ba5e98df08" />
+
 ### AWS Redshift
 
-*Still In Progress*
+<img width="1897" height="971" alt="Screenshot 2025-10-31 021340" src="https://github.com/user-attachments/assets/39bbc9cb-be8f-4a0e-90d7-2af207db85ef" />
 
 ## More Information Regarding Template
 
