@@ -32,6 +32,11 @@ resource "aws_iam_role_policy_attachment" "secrets_full_access" {
   policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
 }
 
+resource "aws_iam_role_policy_attachment" "glue_service_role" {
+ role        = aws_iam_role.glue_service_role.name
+ policy_arn  = "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
+}
+
 resource "aws_iam_role_policy" "glue_service_policy" {
   role   = aws_iam_role.glue_service_role.name
   policy = <<EOF

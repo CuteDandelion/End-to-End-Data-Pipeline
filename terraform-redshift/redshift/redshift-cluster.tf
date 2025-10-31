@@ -29,3 +29,33 @@ resource "aws_redshift_cluster" "redshift-cluster" {
     Environment = var.app_environment
   }
 }
+
+# --- STS Endpoint ---
+resource "aws_vpc_endpoint" "sts" {
+  vpc_id              = aws_vpc.redshift-vpc.id
+  service_name        = "com.amazonaws.us-east-2.sts"
+  vpc_endpoint_type   = "Interface"
+  subnet_ids          = aws_redshift_subnet_group.redshift-subnet-group.subnet_ids
+  security_group_ids  = [aws_default_security_group.redshift_security_group.id]
+  private_dns_enabled = true
+}
+
+# --- Glue Endpoint ---
+resource "aws_vpc_endpoint" "glue" {
+  vpc_id              = aws_vpc.redshift-vpc.id
+  service_name        = "com.amazonaws.us-east-2.glue"
+  vpc_endpoint_type   = "Interface"
+  subnet_ids          = aws_redshift_subnet_group.redshift-subnet-group.subnet_ids
+  security_group_ids  = [aws_default_security_group.redshift_security_group.id]
+  private_dns_enabled = true
+}
+
+# --- Secrets Manager Endpoint ---
+resource "aws_vpc_endpoint" "secretsmanager" {
+  vpc_id              = aws_vpc.redshift-vpc.id
+  service_name        = "com.amazonaws.us-east-2.secretsmanager"
+  vpc_endpoint_type   = "Interface"
+  subnet_ids          = aws_redshift_subnet_group.redshift-subnet-group.subnet_ids
+  security_group_ids  = [aws_default_security_group.redshift_security_group.id]
+  private_dns_enabled = true
+}

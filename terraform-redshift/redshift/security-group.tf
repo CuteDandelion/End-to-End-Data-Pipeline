@@ -15,7 +15,22 @@ resource "aws_default_security_group" "redshift_security_group" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"] // update this to secure the connection to the cluster
   }
-  
+
+  ingress {
+    description = "Https Port"
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   tags = {
     Name        = "${var.app_name}-${var.app_environment}-redshift-security-group"
     Environment = var.app_environment
