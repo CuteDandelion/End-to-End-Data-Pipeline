@@ -1,0 +1,32 @@
+adminUser: admin
+adminPassword: "Admin123!" # change this in production
+
+service:
+  type: LoadBalancer
+  port: 3000
+
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        url: http://kube-prom-stack-prometheus.monitoring.svc.cluster.local:9090
+        access: proxy
+        isDefault: true
+
+persistence:
+  enabled: false
+
+dashboardProviders:
+  dashboardproviders.yaml:
+    apiVersion: 1
+    providers:
+      - name: 'default'
+        orgId: 1
+        folder: ''
+        type: file
+        options:
+          path: /var/lib/grafana/dashboards
+
+# You can mount ConfigMaps with dashboards or use grafana API later to import
