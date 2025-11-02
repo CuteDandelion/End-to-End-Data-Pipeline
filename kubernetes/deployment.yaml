@@ -208,7 +208,7 @@ spec:
     matchLabels:
       app: pipeline
   endpoints:
-    - port: 5556
+    - port: "5556"
       path: /metrics
       interval: 15s
   namespaceSelector:
