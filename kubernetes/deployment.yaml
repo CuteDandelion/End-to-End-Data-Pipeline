@@ -200,7 +200,7 @@ data:
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: service-monitor
+  name: pipeline-service-monitor
   labels:
     release: kube-prom-stack
 spec:
@@ -208,7 +208,7 @@ spec:
     matchLabels:
       app: pipeline
   endpoints:
-    - port: "5556"
+    - port: "kafka-metrics"
       path: /metrics
       interval: 15s
   namespaceSelector:
