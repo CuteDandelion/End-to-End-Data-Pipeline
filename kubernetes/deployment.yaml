@@ -84,6 +84,9 @@ spec:
           image: confluentinc/cp-kafka:7.5.11
           ports:
             - containerPort: 9092
+              name: kafka
+            - containerPort: 9999
+              name: jmx
           env:
             - name: KAFKA_ZOOKEEPER_CONNECT
               value: "localhost:2181"
@@ -91,18 +94,27 @@ spec:
               value: "PLAINTEXT://0.0.0.0:9092"
             - name: KAFKA_ADVERTISED_LISTENERS
               value: "PLAINTEXT://localhost:9092"
+            - name: JMX_PORT
+              value: "9999"
+            - name: KAFKA_OPTS
+              value: "-Dcom.sun.management.jmxremote
+                      -Dcom.sun.management.jmxremote.authenticate=false
+                      -Dcom.sun.management.jmxremote.ssl=false
+                      -Dcom.sun.management.jmxremote.local.only=false
+                      -Djava.rmi.server.hostname=127.0.0.1"
 
-        # Kafka Prom Metrics
-        - name: kafka-jmx-exporter
-          image: prom/jmx-exporter:0.17.2
-          args: ["9404", "/etc/jmx/kafka.yml"]
+        #  JMX exporter sidecar
+        - name: jmx-exporter
+          image: bitnami/jmx-exporter:latest
+          args:
+            - "5556"                # Prometheus metrics port
+            - "/config/jmx-config.yaml"
           ports:
-            - name: kafka-metrics
-              containerPort: 9404
+            - containerPort: 5556
+              name: metrics
           volumeMounts:
             - name: jmx-config
-              mountPath: /etc/jmx
-
+              mountPath: /config
 
         # Kafka client - to run producer script
         - name: kafka-client
@@ -166,9 +178,22 @@ kind: ConfigMap
 metadata:
   name: kafka-jmx-config
 data:
-  kafka.yml: |
+  jmx-config.yaml: |
+    startDelaySeconds: 0
     lowercaseOutputName: true
+    lowercaseOutputLabelNames: true
     rules:
       - pattern: "kafka.server<type=(.+), name=(.+)PerSec\\w*><>Count"
         name: kafka_server_$1_$2_total
         type: COUNTER
+        help: Kafka server $1 $2 per second count
+      - pattern: "kafka.server<type=(.+), name=(.+)><>Value"
+        name: kafka_server_$1_$2
+        type: GAUGE
+        help: Kafka server $1 $2
+      - pattern: "kafka.network<type=(.+), name=(.+)><>Value"
+        name: kafka_network_$1_$2
+        type: GAUGE
+        help: Kafka network $1 $2
+      - pattern: ".*"
+

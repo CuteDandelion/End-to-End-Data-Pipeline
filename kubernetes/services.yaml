@@ -10,6 +10,9 @@ spec:
     - name: airflow
       port: 5000
       targetPort: 5000
+    - name: kafka-metrics
+      port: metrics
+      targetPort: metrics
     - name: spark-ui
       port: 4040
       targetPort: 4040
