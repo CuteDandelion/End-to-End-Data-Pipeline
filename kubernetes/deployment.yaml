@@ -97,24 +97,19 @@ spec:
             - name: JMX_PORT
               value: "9999"
             - name: KAFKA_OPTS
-              value: "-Dcom.sun.management.jmxremote
-                      -Dcom.sun.management.jmxremote.authenticate=false
-                      -Dcom.sun.management.jmxremote.ssl=false
-                      -Dcom.sun.management.jmxremote.local.only=false
-                      -Djava.rmi.server.hostname=127.0.0.1"
+              value: "-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9999 -Dcom.sun.management.jmxremote.rmi.port=9999 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
 
         #  JMX exporter sidecar
         - name: jmx-exporter
           image: bitnami/jmx-exporter:latest
           args:
-            - "5556"                # Prometheus metrics port
-            - "/config/jmx-config.yaml"
+            - "--config.file=/etc/jmx-exporter/config.yml"
           ports:
             - containerPort: 5556
               name: metrics
           volumeMounts:
             - name: jmx-config
-              mountPath: /config
+              mountPath: /etc/jmx-exporter
 
         # Kafka client - to run producer script
         - name: kafka-client
@@ -178,8 +173,9 @@ kind: ConfigMap
 metadata:
   name: kafka-jmx-config
 data:
-  jmx-config.yaml: |
+  config.yml: |
     startDelaySeconds: 0
+    hostPort: "localhost:9999"
     lowercaseOutputName: true
     lowercaseOutputLabelNames: true
     rules:
