@@ -100,7 +100,7 @@ spec:
             - name: kafka-metrics
               containerPort: 9404
           volumeMounts:
-            - name: kafka-jmx-config
+            - name: jmx-config
               mountPath: /etc/jmx
 
 
@@ -154,6 +154,9 @@ spec:
       volumes:
         - name: airflow-logs
           emptyDir: {}
+        - name: jmx-config
+          configMap:
+            name: kafka-jmx-config
 
 
 ---
