@@ -103,13 +103,13 @@ spec:
         - name: jmx-exporter
           image: bitnami/jmx-exporter:latest
           args:
-            - "--config.file=/etc/jmx-exporter/config.yml"
+            - "--config.file=/config/config.yml"
           ports:
             - containerPort: 5556
               name: metrics
           volumeMounts:
             - name: jmx-config
-              mountPath: /etc/jmx-exporter
+              mountPath: /config
 
         # Kafka client - to run producer script
         - name: kafka-client
