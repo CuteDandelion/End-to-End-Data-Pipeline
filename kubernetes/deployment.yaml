@@ -103,6 +103,7 @@ spec:
         - name: jmx-exporter
           image: bitnami/jmx-exporter:latest
           args:
+            - "5556"
             - "/etc/jmx-exporter/config.yml"
           ports:
             - containerPort: 5556
