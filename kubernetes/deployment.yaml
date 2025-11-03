@@ -146,6 +146,11 @@ spec:
               value: "s3a://data-pipeline-data-bucket-dddef6e8/raw-data/streaming_raw/"
             - name: ANOMALY_DATA_PATH
               value: "s3a://data-pipeline-data-bucket-dddef6e8/processed-data/streaming_anomalies/"
+          volumeMounts:
+            - name: spark-metrics
+              mountPath: /opt/spark/conf/metrics.properties  # SubPath to place the file directly
+              subPath: metrics.properties
+
         # Dev storage
         - name: mongodb
           image: mongo:latest
@@ -165,6 +170,9 @@ spec:
         - name: jmx-config
           configMap:
             name: kafka-jmx-config
+        - name: spark-metrics
+          configMap:
+            name: spark-metrics-config
 
 
 ---
@@ -194,6 +202,22 @@ data:
         help: Kafka network $1 $2
       - pattern: ".*"
 
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: spark-metrics-config
+data:
+  metrics.properties: |
+    # Enable Prometheus sink for all instances (driver, executors, etc.)
+    *.sink.prometheusServlet.class=org.apache.spark.metrics.sink.PrometheusServlet
+    *.sink.prometheusServlet.path=/metrics/prometheus
+    # Optional: Customize namespace for better labeling in Prometheus
+    *.sink.prometheusServlet.namespace=spark_pipeline
+    # Driver-specific (adjust if needed for master/worker)
+    driver.sink.prometheusServlet.path=/metrics/prometheus
 
 ---
 
