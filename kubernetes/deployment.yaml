@@ -143,9 +143,9 @@ spec:
                   name: minio-credentials
                   key: MINIO_SECRET_KEY
             - name: RAW_DATA_PATH
-              value: "s3a://data-pipeline-data-bucket-de0af943/raw-data/streaming_raw/"
+              value: "s3a://data-pipeline-data-bucket-8d2fdf36/raw-data/streaming_raw/"
             - name: ANOMALY_DATA_PATH
-              value: "s3a://data-pipeline-data-bucket-de0af943/processed-data/streaming_anomalies/"
+              value: "s3a://data-pipeline-data-bucket-8d2fdf36/processed-data/streaming_anomalies/"
         # Dev storage
         - name: mongodb
           image: mongo:latest
