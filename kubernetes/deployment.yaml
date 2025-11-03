@@ -107,7 +107,7 @@ spec:
             - "/etc/jmx-exporter/config.yml"
           ports:
             - containerPort: 5556
-              name: metrics
+              name: kafka-metrics
           volumeMounts:
             - name: jmx-config
               mountPath: /etc/jmx-exporter
