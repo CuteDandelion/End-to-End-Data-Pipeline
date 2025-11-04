@@ -146,10 +146,10 @@ spec:
               value: "s3a://data-pipeline-data-bucket-fa2e987a/raw-data/streaming_raw/"
             - name: ANOMALY_DATA_PATH
               value: "s3a://data-pipeline-data-bucket-fa2e987a/processed-data/streaming_anomalies/"
-          volumeMounts:
-            - name: spark-metrics
-              mountPath: /opt/spark/conf/metrics.properties  # SubPath to place the file directly
-              subPath: metrics.properties
+          #volumeMounts:
+          #  - name: spark-metrics
+          #    mountPath: /opt/spark/conf/metrics.properties  # SubPath to place the file directly
+          #    subPath: metrics.properties
 
         # Dev storage
         - name: mongodb
@@ -170,9 +170,9 @@ spec:
         - name: jmx-config
           configMap:
             name: kafka-jmx-config
-        - name: spark-metrics
-          configMap:
-            name: spark-metrics-config
+        #- name: spark-metrics
+        #  configMap:
+        #    name: spark-metrics-config
 
 
 ---
