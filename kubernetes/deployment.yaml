@@ -143,9 +143,9 @@ spec:
                   name: minio-credentials
                   key: MINIO_SECRET_KEY
             - name: RAW_DATA_PATH
-              value: "s3a://data-pipeline-data-bucket-dddef6e8/raw-data/streaming_raw/"
+              value: "s3a://data-pipeline-data-bucket-fa2e987a/raw-data/streaming_raw/"
             - name: ANOMALY_DATA_PATH
-              value: "s3a://data-pipeline-data-bucket-dddef6e8/processed-data/streaming_anomalies/"
+              value: "s3a://data-pipeline-data-bucket-fa2e987a/processed-data/streaming_anomalies/"
           volumeMounts:
             - name: spark-metrics
               mountPath: /opt/spark/conf/metrics.properties  # SubPath to place the file directly
