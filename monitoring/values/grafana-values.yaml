@@ -11,7 +11,7 @@ datasources:
     datasources:
       - name: Prometheus
         type: prometheus
-        url: http://kube-prom-stack-prometheus.monitoring.svc.cluster.local:9090
+        url: http://kube-prom-stack-kube-prome-prometheus.monitoring.svc.cluster.local:9090
         access: proxy
         isDefault: true
 
