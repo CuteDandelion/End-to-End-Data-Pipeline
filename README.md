@@ -94,6 +94,12 @@ https://github.com/user-attachments/assets/a6badc68-4a03-4003-96a1-397b32aefa30
 
 <img width="1897" height="971" alt="Screenshot 2025-10-31 021340" src="https://github.com/user-attachments/assets/39bbc9cb-be8f-4a0e-90d7-2af207db85ef" />
 
+### Monitoring & Observability
+
+<img width="1888" height="1066" alt="prom_20" src="https://github.com/user-attachments/assets/ba77ba6e-9383-46f2-a91f-21dc8b211b43" />
+<img width="1901" height="1102" alt="grafana_20" src="https://github.com/user-attachments/assets/9d58141f-3491-4664-a868-40f5298ff975" />
+
+
 ## More Information Regarding Template
 
 ## Table of Contents 
